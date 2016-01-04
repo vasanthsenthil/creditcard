@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.bridgeport.cpsc350.project1.dao.CustomerDao">
+	<resultMap type="Customer" id="customerResultMap">
+		<id property="custid" column="custId" />
+		<result property="custname" column="custName" />
+	</resultMap>
+	<select id="findAll" resultMap="customerResultMap"
+		parameterType="java.util.Map">
+		 <![CDATA[
+		select a.custId, a.custName 
+		from CUSTOMER a
+		join ACCOUNT b on a.custId = b.custId
+		join creditcard c on b.accountno = c.accountNo
+		join (select distinct cardId from traderecord where tradetype = '1' and amount > 1000) d on c.cardId = d.cardId
+		where a.education = '3' and rownum >= #{startPage} and rownum <= #{endPage}
+		 ]]>
+	</select>
+	<select id="countCustomers" resultType="java.lang.Integer">
+		
+		<![CDATA[
+		select count(1) from (
+			select a.custId, a.custName 
+			from CUSTOMER a
+			join ACCOUNT b on a.custId = b.custId
+			join creditcard c on b.accountno = c.accountNo
+			join (select distinct cardId from traderecord where tradetype = '1' and amount > 1000) d on c.cardId = d.cardId
+			where a.education = '3' 
+		) t
+		 ]]>
+	</select>
+	<select id="selectPaging" resultType="hashmap">
+    select a.custId, a.custName  from CUSTOMER a
+</select>
+</mapper>
